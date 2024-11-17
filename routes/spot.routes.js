@@ -83,12 +83,40 @@ router.get("/spots", async (req, res) => {
     if (city) query["location.city"] = city;
 
     // Fetch spots based on the query
-    const spots = await Spot.find(query);
+    const spots = await Spot.find(query).populate("createdBy", "company");
 
     res.status(200).json({ success: true, spots });
   } catch (err) {
     console.error("Error fetching spots:", err);
     res.status(500).json({ message: "Error fetching spots." });
+  }
+});
+
+// GET /spots/:id --> Fetch details of a specific spot
+router.get("/spots/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate the ID  to avoid attempting to query the DB with invalid input
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid spot ID." });
+    }
+
+    // Find the spot by ID
+    const spot = await Spot.findById(id)
+      .populate("createdBy")
+      .populate("bookings");
+
+    // If spot is not found
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found." });
+    }
+
+    // Respond with the spot details
+    res.status(200).json({ success: true, spot });
+  } catch (err) {
+    console.error("Error fetching the spot:", err);
+    res.status(500).json({ message: "Error fetching the spot." });
   }
 });
 
