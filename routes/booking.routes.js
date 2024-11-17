@@ -8,7 +8,7 @@ const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST /bookings --> Create a new booking
-router.post("/bookings", isAuthenticated, async (req, res) => {
+router.post("/", isAuthenticated, async (req, res) => {
   try {
     const userId = req.user._id; // Authenticated user's ID
     const { spotId, startDate, endDate } = req.body;
@@ -52,7 +52,7 @@ router.post("/bookings", isAuthenticated, async (req, res) => {
 });
 
 // GET /bookings --> Get all bookings for the logged-in user
-router.get("/bookings", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const userId = req.user._id; // Authenticated user's ID
 
@@ -71,7 +71,7 @@ router.get("/bookings", async (req, res) => {
 });
 
 // GET /bookings/:id --> Get details of a specific booking
-router.get("/bookings/:id", isAuthenticated, async (req, res) => {
+router.get("/:id", isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params; // Booking ID
     const userId = req.user._id; // Authenticated user's ID
@@ -111,7 +111,7 @@ router.get("/bookings/:id", isAuthenticated, async (req, res) => {
 });
 
 // DELETE /bookings/:id --> Cancel/delete a booking
-router.delete("/bookings/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params; // Booking ID
     const userId = req.user._id; // Authenticated user's ID

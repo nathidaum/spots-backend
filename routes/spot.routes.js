@@ -7,7 +7,7 @@ const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST	/spots --> Create a new spot
-router.post("/spots", isAuthenticated, async (req, res) => {
+router.post("/", isAuthenticated, async (req, res) => {
   try {
     // Extract user ID from the authenticated user
     const createdBy = req.user._id;
@@ -77,7 +77,7 @@ router.post("/spots", isAuthenticated, async (req, res) => {
 });
 
 // GET /spots --> Fetch all spots with optional type and city filters
-router.get("/spots", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { type, city } = req.query;
 
@@ -97,7 +97,7 @@ router.get("/spots", async (req, res) => {
 });
 
 // GET /spots/:id --> Fetch details of a specific spot
-router.get("/spots/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -125,7 +125,7 @@ router.get("/spots/:id", async (req, res) => {
 });
 
 // PUT /spots/:id --> Update a specific spot (only the creator / owner)
-router.put("/spots/:id", isAuthenticated, async (req, res) => {
+router.put("/:id", isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body; // Fields to update
@@ -165,7 +165,7 @@ router.put("/spots/:id", isAuthenticated, async (req, res) => {
 });
 
 // DELETE /spots/:id --> Delete a specific spot (owner-only)
-router.delete("/spots/:id", isAuthenticated, async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id; // Authenticated user's ID

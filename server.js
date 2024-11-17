@@ -14,10 +14,7 @@ app.use(cors());
 connectDB();
 
 // Handle routes
-app.use("/", require("./routes/user.routes"));
-app.use("/auth", require("./routes/user.routes"));
-app.use("/", require("./routes/spot.routes"));
-app.use("/", require("./routes/booking.routes"));
+app.use("/", require("./routes"));
 
 // Start Server
 const PORT = process.env.PORT || 3000;
