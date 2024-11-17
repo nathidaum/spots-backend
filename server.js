@@ -23,6 +23,7 @@ mongoose
 app.use("/", require("./routes/user.routes"));
 app.use("/auth", require("./routes/user.routes"));
 app.use("/", require("./routes/spot.routes"));
+app.use("/", require("./routes/booking.routes"));
 
 // Start Server
 const PORT = process.env.PORT || 3000;
