@@ -19,10 +19,8 @@ mongoose
     console.log("Error connecting to MongoDB:", error);
   });
 
-// Test Route
-app.get("/", (req, res, next) => {
-  res.send("Welcome to the Spots API");
-});
+// Handle routes
+app.use("/", require("./routes/user.routes"))
 
 // Start Server
 const PORT = process.env.PORT || 3000;
