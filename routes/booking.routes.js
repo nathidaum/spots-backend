@@ -110,6 +110,48 @@ router.get("/bookings/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// DELETE /bookings/:id  --> Cancel/ delete a booking
+// DELETE /bookings/:id --> Cancel/delete a booking
+router.delete("/bookings/:id", async (req, res) => {
+  try {
+    const { id } = req.params; // Booking ID
+    const userId = req.user._id; // Authenticated user's ID
+
+    // Validate the Booking ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid booking ID." });
+    }
+
+    // Find the booking by ID
+    const booking = await Booking.findById(id)
+      .populate("userId", "firstName lastName email")
+      .populate("spotId", "title location createdBy");
+
+    // If booking not found
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found." });
+    }
+
+    // Ensure the user is either the one who created the booking or owns/hosts the spot
+    const isBookingOwner = booking.userId._id.toString() === userId.toString();
+    const isSpotOwner =
+      booking.spotId.createdBy.toString() === userId.toString();
+
+    if (!isBookingOwner && !isSpotOwner) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this booking." });
+    }
+
+    // Delete the booking after authorization
+    await Booking.findByIdAndDelete(id);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Booking deleted successfully." });
+  } catch (err) {
+    console.error("Error while deleting the booking:", err);
+    res.status(500).json({ message: "Error while deleting the booking." });
+  }
+});
 
 module.exports = router;
