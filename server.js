@@ -20,7 +20,8 @@ mongoose
   });
 
 // Handle routes
-app.use("/", require("./routes/user.routes"))
+app.use("/", require("./routes/user.routes"));
+app.use("/auth", require("./routes/user.routes"));
 
 // Start Server
 const PORT = process.env.PORT || 3000;
