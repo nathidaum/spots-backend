@@ -160,4 +160,43 @@ router.put("/spots/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// DELETE /spots/:id --> Delete a specific spot (owner-only)
+router.delete("/spots/:id", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id; // Authenticated user's ID
+
+    // Validate the ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid spot ID." });
+    }
+
+    // Find the spot by ID
+    const spot = await Spot.findById(id);
+
+    // If spot not found
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found." });
+    }
+
+    // Ensure the user created / owns the spot
+    if (spot.createdBy.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "You are not authorized to delete this spot." });
+    }
+
+    // Delete the spot
+    await Spot.findByIdAndDelete(id);
+
+    // Remove the spot reference from the user's createdSpots array
+    await User.findByIdAndUpdate(userId, {
+      $pull: { createdSpots: id },
+    });
+
+    res.status(200).json({ success: true, message: "Spot deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting the spot:", err);
+    res.status(500).json({ message: "Error deleting the spot." });
+  }
+});
+
 module.exports = router;
