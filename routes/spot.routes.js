@@ -120,4 +120,44 @@ router.get("/spots/:id", async (req, res) => {
   }
 });
 
+// PUT /spots/:id --> Update a specific spot (only the creator / owner)
+router.put("/spots/:id", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body; // Fields to update
+    const userId = req.user._id; // Authenticated user's ID
+
+    // Validate the ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid spot ID." });
+    }
+
+    // Find the spot by ID
+    const spot = await Spot.findById(id);
+
+    // If spot not found
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found." });
+    }
+
+    // Ensure the user owns the spot
+    if (spot.createdBy.toString() !== userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to update this spot." });
+    }
+
+    // Update the spot
+    const updatedSpot = await Spot.findByIdAndUpdate(id, updates, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure the updates follow schema validation rules
+    });
+
+    res.status(200).json({ success: true, spot: updatedSpot });
+  } catch (err) {
+    console.error("Error updating the spot:", err);
+    res.status(500).json({ message: "Error updating the spot." });
+  }
+});
+
 module.exports = router;
