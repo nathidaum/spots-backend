@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
@@ -33,10 +34,13 @@ router.post("/spots", isAuthenticated, async (req, res) => {
       !location.city ||
       !location.address ||
       !amenities?.length ||
-      !price ||
-      !images?.length
+      !price
     ) {
       return res.status(400).json({ message: "Missing required fields." });
+    }
+
+    if (!Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ message: "Images must be an array with at least one URL." });
     }
 
     // Check if user exists
