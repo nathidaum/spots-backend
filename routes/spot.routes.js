@@ -72,4 +72,24 @@ router.post("/spots", isAuthenticated, async (req, res) => {
   }
 });
 
+// GET /spots --> Fetch all spots with optional type and city filters
+router.get("/spots", async (req, res) => {
+  try {
+    const { type, city } = req.query;
+
+    // Build the query object dynamically based on filters
+    const query = {};
+    if (type) query.type = type;
+    if (city) query["location.city"] = city;
+
+    // Fetch spots based on the query
+    const spots = await Spot.find(query);
+
+    res.status(200).json({ success: true, spots });
+  } catch (err) {
+    console.error("Error fetching spots:", err);
+    res.status(500).json({ message: "Error fetching spots." });
+  }
+});
+
 module.exports = router;
