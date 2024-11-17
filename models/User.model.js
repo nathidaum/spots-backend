@@ -6,17 +6,24 @@ const userSchema = new Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: {
-    type: [String],
-    enum: ["guest", "host", "admin"],
-    default: ["guest"],
-  },
   profile: {
     phoneNumber: { type: String },
-    position: { type: String }, // Guests only
-    linkedInUrl: { type: String }, // Guests only
-    company: { type: String, required: true }, // Required for both guests and hosts
+    position: { type: String },
+    linkedInUrl: { type: String }, 
+    company: { type: String, required: true },
   },
+  createdSpots: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Spot", // References spots created by the host
+    },
+  ],
+  bookings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking", // References bookings made by the user
+    },
+  ],
   favorites: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -28,14 +35,6 @@ const userSchema = new Schema({
 
 // Add pre-save validation middleware
 userSchema.pre("save", function (next) {
-  // Ensure position and LinkedIn URL for guests
-  if (this.role.includes("guest")) {
-    if (!this.profile.position || !this.profile.linkedInUrl) {
-      return next(
-        new Error("Position and LinkedIn URL are required for guests."),
-      );
-    }
-  }
   // Ensure company for all roles
   if (!this.profile.company) {
     return next(new Error("Your company name is required."));
