@@ -20,19 +20,10 @@ const bookingSchema = new Schema({
     type: Date,
     required: true,
   },
-  status: {
-    type: String,
-    enum: ["pending", "confirmed", "canceled", "completed", "blocked"],
-    default: "pending",
-  }, // "blocked" for host blocks
-  createdAt: {
+  bookedAt: {
     type: Date,
     default: Date.now,
-  },
-  createdByHost: {
-    type: Boolean,
-    default: false,
-  }, // true for host-created blocks
+  }
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
