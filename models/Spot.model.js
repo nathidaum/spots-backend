@@ -36,7 +36,7 @@ const spotSchema = new Schema({
   availability: [{ startDate: Date, endDate: Date }],
   images: { type: [String], required: true },
   status: { type: String, enum: ["active", "inactive"], default: "active" },
-  hostId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
   createdAt: { type: Date, default: Date.now },

@@ -17,7 +17,7 @@ const isAuthenticated = (req, res, next) => {
 
     // Verify. Returns payload if the token is valid, otherwise throws an error
     const payload = jwt.verify(token, process.env.TOKEN_SECRET);
-    req.payload = payload;
+    req.user = payload;
     next();
 
   } catch (err) {
