@@ -52,8 +52,9 @@ router.post("/", isAuthenticated, async (req, res) => {
 });
 
 // GET /bookings --> Get all bookings for the logged-in user
-router.get("/", async (req, res) => {
+router.get("/", isAuthenticated, async (req, res) => {
   try {
+    console.log("Authenticated User in /bookings route:", req.user); // Debug log
     const userId = req.user._id; // Authenticated user's ID
 
     // find bookings belonging to the user
@@ -111,7 +112,7 @@ router.get("/:id", isAuthenticated, async (req, res) => {
 });
 
 // DELETE /bookings/:id --> Cancel/delete a booking
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params; // Booking ID
     const userId = req.user._id; // Authenticated user's ID
