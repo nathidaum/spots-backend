@@ -30,17 +30,8 @@ const userSchema = new Schema({
       ref: "Spot",
     },
   ],
-  createdAt: { type: Date, default: Date.now },
-});
-
-// Add pre-save validation middleware
-userSchema.pre("save", function (next) {
-  // Ensure company for all roles
-  if (!this.profile.company) {
-    return next(new Error("Your company name is required."));
-  }
-  next();
-});
+  createdAt: { type: Date, default: Date.now }, 
+}); // research time in mongoose
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;
