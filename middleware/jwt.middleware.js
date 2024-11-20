@@ -16,7 +16,7 @@ const isAuthenticated = (req, res, next) => {
 
     // Verify the token and attach the payload to the request
     const payload = jwt.verify(token, process.env.TOKEN_SECRET);
-    req.payload = payload;
+    req.user = payload;
     console.log("Payload:", payload);
 
     next();

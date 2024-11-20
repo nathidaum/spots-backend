@@ -142,12 +142,12 @@ router.get("/verify", isAuthenticated, (req, res, next) => {
 
   // Send back the object with user data
   // previously set as the token payload
-  res.json(req.payload);
+  res.json(req.user);
 });
 
 router.get("/favorites", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.payload._id;
+    const userId = req.user._id; ;
     console.log("User ID from token:", userId);
 
     const user = await User.findById(userId).populate("favorites");
