@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const { isAuthenticated } = require("../middleware/jwt.middleware")
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 const User = require("../models/User.model");
 
 // POST /users/register --> Register a new user
@@ -61,12 +61,26 @@ router.post("/register", async (req, res) => {
     // Exclude the password field from the response (for security reasons)
     const { password: _, ...userWithoutPassword } = newUser.toObject();
 
+    // Add these lines to generate and include the JWT token
+    const payload = {
+      _id: newUser._id,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    };
+
+    const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      algorithm: "HS256",
+      expiresIn: "12h",
+    });
+
     res.status(201).json({
       message: "User registered successfully.",
       user: userWithoutPassword,
+      authToken, // Include token in response
     });
   } catch (err) {
-    console.error("Error trying to create an account...\n\n", err);
+    console.error("Error trying to create an account:", err.message, err.stack);
     res.status(500).json({ message: "Error registering user." });
   }
 });
@@ -115,22 +129,41 @@ router.post("/login", async (req, res) => {
     // Send the token as the response
     res.status(200).json({ authToken });
   } catch (err) {
-    console.error("Error trying to log in...\n\n", err);
+    console.error("Error trying to log in...\n\n", err.message, err.stack);
     res.status(500).json({ message: "Internal Server Error." });
   }
 });
 
 // GET /auth/verify
-router.get('/verify', isAuthenticated, (req, res, next) => {
- 
+router.get("/verify", isAuthenticated, (req, res, next) => {
   // If JWT token is valid the payload gets decoded by the
   // isAuthenticated middleware and made available on `req.payload`
   console.log(`req.payload`, req.payload);
- 
+
   // Send back the object with user data
   // previously set as the token payload
   res.json(req.payload);
 });
+
+router.get("/favorites", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.payload._id;
+    console.log("User ID from token:", userId);
+
+    const user = await User.findById(userId).populate("favorites");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const favorites = user.favorites || [];
+    res.status(200).json({ favorites });
+  } catch (error) {
+    console.error("Error fetching user favorites:", error);
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+});
+
 
 
 module.exports = router;
