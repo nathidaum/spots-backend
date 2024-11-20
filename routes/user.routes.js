@@ -136,12 +136,6 @@ router.post("/login", async (req, res) => {
 
 // GET /auth/verify
 router.get("/verify", isAuthenticated, (req, res, next) => {
-  // If JWT token is valid the payload gets decoded by the
-  // isAuthenticated middleware and made available on `req.payload`
-  console.log(`req.payload`, req.payload);
-
-  // Send back the object with user data
-  // previously set as the token payload
   res.json(req.user);
 });
 
@@ -164,6 +158,18 @@ router.get("/favorites", isAuthenticated, async (req, res) => {
   }
 });
 
+// DELETE /users/delete --> Delete the logged-in user's account
+router.delete("/delete", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "Account deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting user account:", err);
+    res.status(500).json({ message: "Error deleting user account." });
+  }
+});
 
 module.exports = router;
