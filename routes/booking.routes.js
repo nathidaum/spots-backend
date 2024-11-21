@@ -60,7 +60,7 @@ router.get("/", isAuthenticated, async (req, res) => {
     // find bookings belonging to the user
     const bookings = await Booking.find({ userId })
       .populate("userId", "firstName lastName email")
-      .populate("spotId", "title location price");
+      .populate("spotId");
 
     res.status(200).json({ success: true, bookings });
   } catch (err) {
@@ -85,7 +85,8 @@ router.get("/:id", isAuthenticated, async (req, res) => {
     // Find the booking by ID and populate fields
     const booking = await Booking.findById(id)
       .populate("userId", "firstName lastName email")
-      .populate("spotId", "title location createdBy");
+      .populate("spotId");
+
 
     // If booking not found
     if (!booking) {
