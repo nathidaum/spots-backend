@@ -172,4 +172,35 @@ router.delete("/delete", isAuthenticated, async (req, res) => {
   }
 });
 
+// POST /users/favorites --> Add or remove a spot from favorites
+router.post("/favorites", isAuthenticated, async (req, res) => {
+  try {
+    const { spotId } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (user.favorites.includes(spotId)) {
+      // If the spot is already a favorite, remove it
+      user.favorites = user.favorites.filter((id) => id.toString() !== spotId);
+    } else {
+      // Otherwise, add it to favorites
+      user.favorites.push(spotId);
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(userId).populate("favorites");
+    res.status(200).json({ favorites: updatedUser.favorites });
+  } catch (error) {
+    console.error("Error toggling favorites:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+
 module.exports = router;
