@@ -16,7 +16,6 @@ router.post("/", isAuthenticated, async (req, res) => {
     const {
       title,
       description,
-      type,
       deskCount,
       location,
       amenities,
@@ -29,7 +28,6 @@ router.post("/", isAuthenticated, async (req, res) => {
     if (
       !title ||
       !description ||
-      !type ||
       !location ||
       !location.city ||
       !location.address ||
@@ -53,7 +51,6 @@ router.post("/", isAuthenticated, async (req, res) => {
     const newSpot = await Spot.create({
       title,
       description,
-      type,
       deskCount,
       location,
       amenities,
@@ -76,14 +73,13 @@ router.post("/", isAuthenticated, async (req, res) => {
   }
 });
 
-// GET /spots --> Fetch all spots with optional type and city filters
+// GET /spots --> Fetch all spots with optional city filters
 router.get("/", async (req, res) => {
   try {
-    const { type, city } = req.query;
+    const { city } = req.query;
 
     // Build the query object dynamically based on filters
     const query = {};
-    if (type) query.type = type;
     if (city) query["location.city"] = city;
 
     // Fetch spots based on the query

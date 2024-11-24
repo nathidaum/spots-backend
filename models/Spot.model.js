@@ -4,16 +4,10 @@ const Schema = mongoose.Schema;
 const spotSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  type: {
-    type: String,
-    enum: ["spot", "room", "office"],
-    required: true,
-  },
   deskCount: {
     type: Number,
-    required: function () {
-      return this.type === "room" || this.type === "office";
-    },
+    required: true,
+    min: 1
   },
   location: {
     city: { type: String, required: true },
@@ -29,8 +23,7 @@ const spotSchema = new Schema({
       "Phonebox",
       "Meeting Room",
       "Kitchen",
-    ],
-    required: true,
+    ]
   },
   price: { type: Number, required: true },
   availability: [{ startDate: Date, endDate: Date }],
