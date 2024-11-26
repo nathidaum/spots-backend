@@ -7,7 +7,7 @@ const spotSchema = new Schema({
   deskCount: {
     type: Number,
     required: true,
-    min: 1
+    min: 1,
   },
   location: {
     city: { type: String, required: true },
@@ -23,13 +23,22 @@ const spotSchema = new Schema({
       "Phonebox",
       "Meeting Room",
       "Kitchen",
-    ]
+    ],
   },
   price: { type: Number, required: true },
-  availability: [{ startDate: Date, endDate: Date }],
+  blockedDates: [
+    {
+      startDate: { type: Date },
+      endDate: { type: Date },
+    },
+  ],
   images: { type: [String], required: true },
   status: { type: String, enum: ["active", "inactive"], default: "active" },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
   createdAt: { type: Date, default: Date.now },

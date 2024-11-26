@@ -8,38 +8,80 @@ const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST /bookings --> Create a new booking
+// POST /bookings --> Create a new booking
 router.post("/", isAuthenticated, async (req, res) => {
   try {
-    const userId = req.user._id; // Authenticated user's ID
+    const userId = req.user._id;
     const { spotId, startDate, endDate } = req.body;
 
-    // Validate required fields
     if (!spotId || !startDate || !endDate) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
-    // Check if the spot exists
     const spot = await Spot.findById(spotId);
     if (!spot) {
       return res.status(404).json({ message: "Spot not found." });
     }
 
-    // Ensure endDate is equal to or after startDate
-    if (new Date(startDate) > new Date(endDate)) {
+    const requestedStart = new Date(startDate);
+    const requestedEnd = new Date(endDate);
+
+    if (requestedStart > requestedEnd) {
       return res
         .status(400)
         .json({ message: "End date must be equal to or after start date." });
     }
 
-    // Create the booking
+    // Debug logs to ensure correct data
+    console.log("Requested Start:", requestedStart);
+    console.log("Requested End:", requestedEnd);
+    console.log("Blocked Dates:", spot.blockedDates);
+
+    // Strip time component for normalized date comparison
+    const stripTime = (date) =>
+      new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+
+    const isBlocked = spot.blockedDates.some(({ startDate, endDate }) => {
+      const blockedStart = stripTime(new Date(startDate));
+      const blockedEnd = stripTime(new Date(endDate));
+
+      // Debug log for each blocked range
+      console.log(
+        `Checking blocked range: Blocked Start: ${blockedStart}, Blocked End: ${blockedEnd}, Requested Start: ${stripTime(
+          requestedStart
+        )}, Requested End: ${stripTime(requestedEnd)}`
+      );
+
+      return (
+        stripTime(requestedStart) <= blockedEnd &&
+        stripTime(requestedEnd) >= blockedStart
+      );
+    });
+
+    if (isBlocked) {
+      console.error(
+        "Dates are blocked. Requested:",
+        requestedStart,
+        requestedEnd
+      );
+      return res
+        .status(400)
+        .json({ message: "The selected dates are already booked." });
+    }
+
+    // Create new booking
     const newBooking = await Booking.create({
-      userId, // Authenticated user ID
+      userId,
       spotId,
       startDate,
       endDate,
     });
 
-    // Add the booking reference to the user's bookings array
+    // Add the new blocked dates to the spot
+    spot.blockedDates.push({ startDate: requestedStart, endDate: requestedEnd });
+    await spot.save();
+
+    // Add the booking to the user
     await User.findByIdAndUpdate(userId, {
       $push: { bookings: newBooking._id },
     });
@@ -86,7 +128,6 @@ router.get("/:id", isAuthenticated, async (req, res) => {
     const booking = await Booking.findById(id)
       .populate("userId", "firstName lastName email")
       .populate("spotId");
-
 
     // If booking not found
     if (!booking) {
