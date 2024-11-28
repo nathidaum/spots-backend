@@ -38,7 +38,9 @@ router.post("/", isAuthenticated, async (req, res) => {
     }
 
     if (!Array.isArray(images) || images.length === 0) {
-      return res.status(400).json({ message: "Images must be an array with at least one URL." });
+      return res
+        .status(400)
+        .json({ message: "Images must be an array with at least one URL." });
     }
 
     // Check if user exists
@@ -85,7 +87,9 @@ router.get("/", async (req, res) => {
     if (maxPrice) query["price"] = { $lte: parseInt(maxPrice) }; // less or equal
 
     // Fetch spots based on the query
-    const spots = await Spot.find(query).populate("createdBy", "company");
+    const spots = await Spot.find(query)
+      .populate("createdBy", "company")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, spots });
   } catch (err) {
@@ -104,7 +108,6 @@ router.get("/cities", async (req, res) => {
     res.status(500).json({ message: "Error fetching cities." });
   }
 });
-
 
 // GET /spots/:id --> Fetch details of a specific spot
 router.get("/:id", async (req, res) => {
@@ -195,7 +198,9 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
 
     // Ensure the user created / owns the spot
     if (spot.createdBy.toString() !== userId.toString()) {
-      return res.status(403).json({ message: "You are not authorized to delete this spot." });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this spot." });
     }
 
     // Delete the spot
@@ -206,7 +211,9 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
       $pull: { createdSpots: id },
     });
 
-    res.status(200).json({ success: true, message: "Spot deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Spot deleted successfully." });
   } catch (err) {
     console.error("Error deleting the spot:", err);
     res.status(500).json({ message: "Error deleting the spot." });
