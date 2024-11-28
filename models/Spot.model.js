@@ -16,13 +16,13 @@ const spotSchema = new Schema({
   amenities: {
     type: [String],
     enum: [
-      "Wifi",
-      "Parking",
       "Coffee",
-      "Lift",
-      "Phonebox",
-      "Meeting Room",
       "Kitchen",
+      "Lift",
+      "Meeting Room",
+      "Parking",
+      "Phonebox",
+      "Wifi"
     ],
   },
   price: { type: Number, required: true },
@@ -33,7 +33,6 @@ const spotSchema = new Schema({
     },
   ],
   images: { type: [String], required: true },
-  status: { type: String, enum: ["active", "inactive"], default: "active" },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
