@@ -15,6 +15,7 @@ const bookingSchema = new Schema({
   startDate: {
     type: Date,
     required: true,
+    index: true
   },
   endDate: {
     type: Date,

@@ -81,7 +81,8 @@ router.get("/", isAuthenticated, async (req, res) => {
     // find bookings belonging to the user
     const bookings = await Booking.find({ userId })
       .populate("userId", "firstName lastName email")
-      .populate("spotId");
+      .populate("spotId")
+      .sort({ startDate: +1 }); // sort to show the upcoming ones first
 
     res.status(200).json({ success: true, bookings });
   } catch (err) {
