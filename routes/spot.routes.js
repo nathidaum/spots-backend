@@ -20,7 +20,6 @@ router.post("/", isAuthenticated, async (req, res) => {
       location,
       amenities,
       price,
-      availability,
       images,
     } = req.body;
 
@@ -55,10 +54,8 @@ router.post("/", isAuthenticated, async (req, res) => {
       location,
       amenities,
       price,
-      availability,
       images,
-      createdBy,
-      status: "active", // Set default status
+      createdBy
     });
 
     // Add the new spot to the user's createdSpots array
@@ -76,11 +73,13 @@ router.post("/", isAuthenticated, async (req, res) => {
 // GET /spots --> Fetch all spots with optional city filters
 router.get("/", async (req, res) => {
   try {
-    const { city } = req.query;
+    const { city, minDeskCount, maxPrice } = req.query;
 
     // Build the query object dynamically based on filters
     const query = {};
     if (city) query["location.city"] = city;
+    if (minDeskCount) query["deskCount"] = { $gte: parseInt(minDeskCount) }; // greater or equal
+    if (maxPrice) query["price"] = { $lte: parseInt(maxPrice) }; // less or equal
 
     // Fetch spots based on the query
     const spots = await Spot.find(query).populate("createdBy", "company");
@@ -91,6 +90,18 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Error fetching spots." });
   }
 });
+
+// GET /cities (for filter functionality)
+router.get("/cities", async (req, res) => {
+  try {
+    const cities = await Spot.distinct("location.city"); // Fetch unique cities
+    res.status(200).json({ success: true, cities });
+  } catch (err) {
+    console.error("Error fetching cities:", err);
+    res.status(500).json({ message: "Error fetching cities." });
+  }
+});
+
 
 // GET /spots/:id --> Fetch details of a specific spot
 router.get("/:id", async (req, res) => {
