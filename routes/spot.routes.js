@@ -20,6 +20,7 @@ router.post("/", isAuthenticated, async (req, res) => {
       location,
       amenities,
       price,
+      availability,
       images,
     } = req.body;
 
@@ -54,8 +55,10 @@ router.post("/", isAuthenticated, async (req, res) => {
       location,
       amenities,
       price,
+      availability,
       images,
-      createdBy
+      createdBy,
+      status: "active", // Set default status
     });
 
     // Add the new spot to the user's createdSpots array
