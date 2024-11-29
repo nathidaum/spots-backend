@@ -4,7 +4,7 @@
 
 This repository contains the **backend code** for the **Spots Project**, a platform that allows users to book or rent out unused office space. The backend is built using **Node.js**, **Express**, and **MongoDB** and serves as the API for managing user accounts, spots, bookings, and authentication.
 
-The **frontend repository** with the user interface implementation can be found [here](https://github.com/your-username/spots-frontend) (replace with the actual link to the frontend repo).
+The **frontend repository** with the user interface implementation can be found [here](https://github.com/nathidaum/spots-frontend) (replace with the actual link to the frontend repo).
 
 ---
 
